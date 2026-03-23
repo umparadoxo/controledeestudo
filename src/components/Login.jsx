@@ -114,6 +114,13 @@ const Login = () => {
           gap: 32px;
         }
 
+        @media (max-width: 480px) {
+          .login-card { padding: 24px; }
+          .logo-icon { font-size: 2.5rem; }
+          .card-header h2 { font-size: 1.5rem; }
+        }
+
+
         .card-header { text-align: center; }
         .logo-icon { font-size: 3rem; margin-bottom: 16px; display: block; }
         .card-header h2 { font-size: 1.75rem; color: white; margin-bottom: 8px; }

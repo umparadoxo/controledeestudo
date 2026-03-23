@@ -11,7 +11,7 @@ const Navbar = ({ activeTab, setActiveTab, userEmail }) => {
     return `${year}-${month}-${day}`;
   };
 
-  const [stats, setStats] = useState({ today: 0, streak: 0, totalTime: '0h0m' });
+  const [stats, setStats] = useState({ today: 0, streak: 0, totalTime: '0h0m', totalPomodoros: 0 });
 
   useEffect(() => {
     fetchStats();
@@ -60,7 +60,8 @@ const Navbar = ({ activeTab, setActiveTab, userEmail }) => {
     setStats({ 
       today: todayCount, 
       streak: currentStreak, 
-      totalTime: `${h}h${m}m` 
+      totalTime: `${h}h${m}m`,
+      totalPomodoros: sessionData.length
     });
   };
 
@@ -76,191 +77,162 @@ const Navbar = ({ activeTab, setActiveTab, userEmail }) => {
   ];
 
   return (
-    <nav className="navbar glass-card">
-      <div className="nav-left">
-        <div className="status-pill status-red">
-          <span className="status-icon">🍅</span>
-          <span>{stats.today} hoje</span>
+    <>
+      {/* Mobile Top Header (Stats only) */}
+      <header className="mobile-header desktop-hide">
+        <div className="status-scroll">
+          <div className="status-pill status-red">
+            <span className="status-icon">🍅</span>
+            <span>{stats.today} hoje</span>
+          </div>
+          <div className="status-pill status-yellow">
+            <Flame size={14} fill="currentColor" />
+            <span>{stats.streak} dias</span>
+          </div>
+          <div className="status-pill status-blue">
+            <Timer size={14} />
+            <span>{stats.totalPomodoros} total</span>
+          </div>
+          <div className="status-pill status-green">
+            <Clock size={14} />
+            <span>{stats.totalTime}</span>
+          </div>
         </div>
-        <div className="status-pill status-yellow">
-          <Flame size={16} fill="currentColor" />
-          <span>{stats.streak} dias</span>
-        </div>
-        <div className="status-pill status-green">
-          <Clock size={16} />
-          <span>{stats.totalTime} estudadas</span>
-        </div>
-        <div className="status-pill status-gray date-pill">
-          {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' })}
-        </div>
-      </div>
+      </header>
 
-      <div className="nav-center">
+      {/* Desktop Top Navbar */}
+      <nav className="navbar glass-card mobile-hide">
+        <div className="nav-left">
+          <div className="status-pill status-red">
+            <span className="status-icon">🍅</span>
+            <span>{stats.today} hoje</span>
+          </div>
+          <div className="status-pill status-yellow">
+            <Flame size={16} fill="currentColor" />
+            <span>{stats.streak} dias</span>
+          </div>
+          <div className="status-pill status-blue">
+            <Timer size={14} />
+            <span>{stats.totalPomodoros} pomodoros</span>
+          </div>
+          <div className="status-pill status-green">
+            <Clock size={16} />
+            <span>{stats.totalTime} estudadas</span>
+          </div>
+        </div>
+
+        <div className="nav-center">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`nav-btn ${activeTab === item.id ? 'active' : ''}`}
+            >
+              <item.icon size={18} />
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="nav-right">
+          <div className="user-info">
+            <User size={16} />
+            <span className="user-email">{userEmail}</span>
+          </div>
+          <button className="logout-btn" onClick={handleLogout}>
+            <LogOut size={18} />
+            <span>Sair</span>
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="mobile-bottom-nav glass-card desktop-hide">
         {navItems.map((item) => (
           <button
             key={item.id}
             onClick={() => setActiveTab(item.id)}
-            className={`nav-btn ${activeTab === item.id ? 'active' : ''}`}
+            className={`mobile-nav-btn ${activeTab === item.id ? 'active' : ''}`}
           >
-            <item.icon size={18} />
-            <span>{item.label}</span>
+            <item.icon size={26} color={activeTab === item.id ? '#ff4757' : '#747d8c'} strokeWidth={activeTab === item.id ? 2.5 : 2} />
           </button>
         ))}
-      </div>
-
-      <div className="nav-right">
-        <div className="user-info">
-          <User size={16} />
-          <span className="user-email">{userEmail}</span>
-        </div>
-        <button className="logout-btn" onClick={handleLogout} title="Sair">
-          <LogOut size={18} />
-          <span>Sair</span>
+        <button className="mobile-nav-btn" onClick={handleLogout}>
+          <LogOut size={26} color="#747d8c" />
         </button>
-      </div>
+      </nav>
 
       <style jsx>{`
         .navbar {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin: 16px 24px;
-          padding: 8px 16px;
-          border-radius: 100px;
-          background: rgba(12, 13, 16, 0.8);
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          display: flex; align-items: center; justify-content: space-between;
+          margin: 16px 24px; padding: 8px 16px; border-radius: 100px;
+          background: rgba(12, 13, 16, 0.8); border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .nav-left {
-          display: flex;
-          gap: 8px;
-          align-items: center;
+        .mobile-header {
+          padding: 12px 16px; position: sticky; top: 0; z-index: 100;
+          background: rgba(12, 13, 16, 0.9); backdrop-filter: blur(10px);
+          border-bottom: 1px solid var(--border-color);
         }
+
+        .status-scroll { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+        .status-scroll::-webkit-scrollbar { display: none; }
 
         .status-pill {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          padding: 6px 14px;
-          border-radius: 100px;
-          font-size: 0.85rem;
-          font-weight: 600;
-          border: 1px solid transparent;
+          display: flex; align-items: center; gap: 6px; padding: 6px 12px;
+          border-radius: 100px; font-size: 0.75rem; font-weight: 700;
+          white-space: nowrap; border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .status-red {
-          background: rgba(255, 71, 87, 0.1);
-          color: #ff4757;
-          border-color: rgba(255, 71, 87, 0.2);
-        }
+        .status-red { background: rgba(255, 71, 87, 0.1); color: #ff4757; }
+        .status-yellow { background: rgba(255, 165, 2, 0.1); color: #ffa502; }
+        .status-green { background: rgba(46, 213, 115, 0.1); color: #2ed573; }
+        .status-blue { background: rgba(30, 144, 255, 0.1); color: #1e90ff; }
 
-        .status-yellow {
-          background: rgba(255, 165, 2, 0.1);
-          color: #ffa502;
-          border-color: rgba(255, 165, 2, 0.2);
-        }
 
-        .status-green {
-          background: rgba(46, 213, 115, 0.1);
-          color: #2ed573;
-          border-color: rgba(46, 213, 115, 0.2);
-        }
-
-        .status-gray {
-          background: rgba(255, 255, 255, 0.05);
-          color: var(--text-secondary);
-        }
-
-        .nav-center {
-          display: flex;
-          gap: 4px;
-          background: rgba(255, 255, 255, 0.03);
-          padding: 4px;
-          border-radius: 100px;
-        }
-
+        .nav-left { display: flex; gap: 8px; align-items: center; }
+        .nav-center { display: flex; gap: 4px; background: rgba(255, 255, 255, 0.03); padding: 4px; border-radius: 100px; }
+        
         .nav-btn {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          padding: 8px 16px;
-          border-radius: 100px;
-          border: none;
-          background: transparent;
-          color: var(--text-secondary);
-          cursor: pointer;
-          transition: var(--transition);
-          font-size: 0.9rem;
-          font-weight: 500;
+          display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+          border-radius: 100px; border: none; background: transparent;
+          color: var(--text-secondary); cursor: pointer; transition: var(--transition);
+          font-size: 0.9rem; font-weight: 500;
         }
+        .nav-btn.active { background: var(--accent-primary); color: white; }
 
-        .nav-btn:hover {
-          color: white;
-          background: rgba(255, 255, 255, 0.05);
-        }
-
-        .nav-btn.active {
-          background: var(--accent-primary);
-          color: white;
-        }
-
-        .nav-right {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .user-info {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          background: rgba(30, 144, 255, 0.1);
-          color: #1e90ff;
-          padding: 6px 14px;
-          border-radius: 100px;
-          max-width: 180px;
-          overflow: hidden;
-          font-size: 0.85rem;
-          border: 1px solid rgba(30, 144, 255, 0.2);
-        }
-
-        .user-email {
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+        .user-info { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); padding: 6px 14px; border-radius: 100px; font-size: 0.85rem; }
+        
         .logout-btn {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          color: var(--text-secondary);
-          padding: 6px 12px;
-          border-radius: 100px;
-          cursor: pointer;
-          transition: var(--transition);
-          font-size: 0.85rem;
-          font-weight: 600;
+          display: flex; align-items: center; gap: 6px; background: transparent;
+          border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted);
+          padding: 6px 12px; border-radius: 100px; cursor: pointer; font-size: 0.85rem;
         }
 
-        .logout-btn:hover {
-          background: rgba(255, 71, 87, 0.1);
-          color: #ff4757;
-          border-color: #ff4757;
+        .mobile-bottom-nav {
+          position: fixed; bottom: 16px; left: 16px; right: 16px;
+          height: 64px; background: rgba(18, 19, 23, 0.9);
+          border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px;
+          display: flex; justify-content: space-around; align-items: center;
+          z-index: 1000; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+          backdrop-filter: blur(20px);
         }
 
-        .date-pill {
-          text-transform: capitalize;
+        .mobile-nav-btn {
+          display: flex; flex-direction: column; align-items: center; gap: 4px;
+          background: transparent; border: none; color: var(--text-muted);
+          cursor: pointer; width: 20%;
         }
 
-        @media (max-width: 1024px) {
-          .nav-btn span { display: none; }
-          .navbar { margin: 10px; padding: 6px; }
+        .mobile-nav-btn span { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; }
+        .mobile-nav-btn.active { color: white; }
+
+        @media (max-width: 767px) {
+          .mobile-hide { display: none !important; }
         }
       `}</style>
-    </nav>
+    </>
   );
 };
 

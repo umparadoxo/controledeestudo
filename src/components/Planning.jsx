@@ -181,18 +181,21 @@ const Planning = () => {
         .select-group label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
         
         .remove-task-btn { 
-          position: absolute; top: -8px; right: -8px; width: 22px; height: 22px; border-radius: 50%;
-          border: 1px solid var(--border-color); background: #1a1b1e; color: var(--text-muted);
+          position: absolute; top: -10px; right: -10px; width: 28px; height: 28px; border-radius: 50%;
+          border: 1px solid var(--border-color); background: #1a1b1e; color: #ff4757;
           display: flex; align-items: center; justify-content: center; cursor: pointer;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 5;
         }
 
         .add-task-btn {
           display: flex; align-items: center; justify-content: center; gap: 8px;
-          background: transparent; border: 1px dashed var(--border-color); color: var(--text-secondary);
-          padding: 10px; border-radius: 12px; cursor: pointer; font-size: 0.85rem;
+          background: rgba(255,255,255,0.03); border: 1px dashed var(--border-color); color: var(--text-secondary);
+          padding: 12px; border-radius: 12px; cursor: pointer; font-size: 0.85rem;
+          min-height: 44px;
         }
         .add-task-btn:hover { background: rgba(255, 255, 255, 0.05); color: white; }
         .loading { display: flex; justify-content: center; align-items: center; height: 300px; color: white; }
+
       `}</style>
     </div>
   );

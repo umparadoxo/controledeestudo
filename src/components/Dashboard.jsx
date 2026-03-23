@@ -167,38 +167,7 @@ const Dashboard = ({ onStartPomodoro }) => {
 
   return (
     <div className="dashboard-container animate-fade-in">
-      <div className="stats-grid">
-        <div className="glass-card stat-card">
-          <div className="stat-icon red"><Flame size={24} fill="currentColor" /></div>
-          <div className="stat-info"><h3>{stats.streak} Dias</h3><p>Sequência atual</p></div>
-        </div>
-        <div className="glass-card stat-card">
-          <div className="stat-icon blue"><Clock size={24} /></div>
-          <div className="stat-info"><h3>{stats.totalHours}h</h3><p>Tempo total</p></div>
-        </div>
-        <div className="glass-card stat-card">
-          <div className="stat-icon green"><BarChart2 size={24} /></div>
-          <div className="stat-info"><h3>{stats.weekPomodoros}</h3><p>Pomodoros na semana</p></div>
-        </div>
-      </div>
-
       <div className="dashboard-main">
-        <div className="glass-card section-card">
-          <div className="section-header"><h3>Evolução</h3><span className="subtitle">Últimos 90 dias</span></div>
-          <div className="heatmap-wrapper">
-            <div className="heatmap">
-              {heatmapDays.map((day, i) => (
-                <div key={i} className="heatmap-cell" style={{ backgroundColor: getHeatColor(day) }} title={`${format(day, 'dd/MM/yyyy')}`} />
-              ))}
-            </div>
-          </div>
-          <div className="heatmap-legend">
-            <span>Pouco</span>
-            <div className="legend-cells"><div className="heatmap-cell" style={{ backgroundColor: 'rgba(255, 71, 87, 0.2)' }} /><div className="heatmap-cell" style={{ backgroundColor: 'rgba(255, 71, 87, 0.5)' }} /><div className="heatmap-cell" style={{ backgroundColor: 'rgba(255, 71, 87, 0.8)' }} /></div>
-            <span>Muito</span>
-          </div>
-        </div>
-
         <div className="glass-card section-card">
           <div className="section-header">
             <h3>Planejamento</h3>
@@ -227,34 +196,79 @@ const Dashboard = ({ onStartPomodoro }) => {
             )}
           </div>
         </div>
+
+        <div className="glass-card section-card">
+          <div className="section-header"><h3>Evolução</h3><span className="subtitle">Últimos 90 dias</span></div>
+          <div className="heatmap-wrapper">
+            <div className="heatmap">
+              {heatmapDays.map((day, i) => (
+                <div key={i} className="heatmap-cell" style={{ backgroundColor: getHeatColor(day) }} title={`${format(day, 'dd/MM/yyyy')}`} />
+              ))}
+            </div>
+          </div>
+          <div className="heatmap-legend">
+            <span>Pouco</span>
+            <div className="legend-cells"><div className="heatmap-cell" style={{ backgroundColor: 'rgba(255, 71, 87, 0.2)' }} /><div className="heatmap-cell" style={{ backgroundColor: 'rgba(255, 71, 87, 0.5)' }} /><div className="heatmap-cell" style={{ backgroundColor: 'rgba(255, 71, 87, 0.8)' }} /></div>
+            <span>Muito</span>
+          </div>
+        </div>
       </div>
 
       <style jsx>{`
-        .dashboard-container { display: flex; flex-direction: column; gap: 24px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
-        .stat-card { padding: 24px; display: flex; align-items: center; gap: 20px; }
-        .stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .dashboard-container { display: flex; flex-direction: column; gap: 24px; padding-bottom: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+        .stat-card { padding: 16px; display: flex; align-items: center; gap: 16px; border-radius: 20px; }
+        .stat-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .stat-info h3 { font-size: 1.2rem; margin: 0; }
+        .stat-info p { font-size: 0.75rem; margin: 0; }
+        
         .stat-icon.red { background: rgba(255, 71, 87, 0.1); color: #ff4757; }
         .stat-icon.blue { background: rgba(30, 144, 255, 0.1); color: #1e90ff; }
         .stat-icon.green { background: rgba(46, 213, 115, 0.1); color: #2ed573; }
-        .dashboard-main { display: grid; grid-template-columns: 1fr; gap: 24px; }
-        @media (min-width: 1100px) { .dashboard-main { grid-template-columns: 1.5fr 1fr; } }
-        .section-card { padding: 24px; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .subtitle { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
-        .heatmap-wrapper { overflow-x: auto; margin-bottom: 16px; }
+        
+        .dashboard-main { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        @media (min-width: 1100px) { .dashboard-main { grid-template-columns: 1.5fr 1fr; gap: 24px; } }
+        
+        .section-card { padding: 20px; border-radius: 24px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .subtitle { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+        
+        .heatmap-wrapper { overflow-x: auto; margin-bottom: 16px; padding-bottom: 8px; scrollbar-width: none; }
+        .heatmap-wrapper::-webkit-scrollbar { display: none; }
         .heatmap { display: grid; grid-template-columns: repeat(13, 14px); grid-template-rows: repeat(7, 14px); grid-auto-flow: column; gap: 4px; }
-        .heatmap-cell { width: 14px; height: 14px; border-radius: 2px; }
-        .plans-list { display: flex; flex-direction: column; gap: 12px; }
-        .plan-item { padding: 16px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 16px; display: flex; align-items: center; gap: 12px; }
+        .heatmap-cell { width: 14px; height: 14px; border-radius: 3px; }
+        
+        .plans-list { display: flex; flex-direction: column; gap: 10px; }
+        .plan-item { 
+          padding: 12px; background: rgba(255, 255, 255, 0.03); 
+          border: 1px solid var(--border-color); border-radius: 18px; 
+          display: flex; align-items: center; gap: 12px;
+          min-height: 72px;
+        }
         .plan-item.completed { opacity: 0.6; background: rgba(46, 213, 115, 0.05); }
-        .check-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; }
-        .check-btn.checked { color: var(--success); }
-        .discipline-full-name { font-size: 1.1rem; font-weight: 600; color: white; }
+        
+        .check-btn { 
+          width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+          background: rgba(255, 255, 255, 0.05); border: none; color: var(--text-muted); border-radius: 12px; cursor: pointer; 
+        }
+        .check-btn.checked { color: var(--success); background: rgba(46, 213, 115, 0.1); }
+        
+        .plan-topic { flex: 1; overflow: hidden; }
+        .discipline-full-name { font-size: 1rem; font-weight: 600; color: white; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .completed .discipline-full-name { text-decoration: line-through; color: var(--text-muted); }
-        .start-btn-sm { padding: 8px 16px; font-size: 0.85rem; border-radius: 10px; }
-        .no-plan { text-align: center; color: var(--text-muted); }
+        
+        .start-btn-sm { padding: 10px 16px; font-size: 0.8rem; border-radius: 12px; font-weight: 700; flex-shrink: 0; }
+        .no-plan { text-align: center; color: var(--text-muted); padding: 20px; }
+
+        @media (max-width: 600px) {
+          .stats-grid { grid-template-columns: 1fr; }
+          .stat-card { padding: 20px; }
+          .section-card { padding: 16px; }
+          .plan-item { gap: 8px; }
+          .discipline-full-name { font-size: 0.95rem; }
+        }
       `}</style>
+
     </div>
   );
 };

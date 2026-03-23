@@ -225,27 +225,37 @@ const PomodoroTimer = ({ isFocusMode, setIsFocusMode, initialTask, onClearTask }
         .mode-btn.active.study { background: var(--accent-primary); color: white; box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3); }
         .mode-btn.active.break { background: var(--success); color: white; box-shadow: 0 4px 12px rgba(46, 213, 115, 0.3); }
 
-        .timer-display { text-align: center; margin: 20px 0; }
-        .timer-text { font-family: 'JetBrains Mono', monospace; font-size: 8rem; font-weight: 700; color: white; line-height: 1; }
-        .fullscreen .timer-text { font-size: 15rem; }
+        .timer-display { text-align: center; margin: 10px 0; }
+        .timer-text { font-family: 'JetBrains Mono', monospace; font-size: 5rem; font-weight: 700; color: white; line-height: 1; }
+        .fullscreen .timer-text { font-size: 8rem; }
 
-        .timer-controls { display: flex; align-items: center; gap: 32px; }
-        .main-control { width: 80px; height: 80px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+        @media (min-width: 768px) {
+          .timer-text { font-size: 8rem; }
+          .fullscreen .timer-text { font-size: 15rem; }
+        }
+
+        .timer-controls { display: flex; align-items: center; gap: 24px; }
+        @media (min-width: 768px) { .timer-controls { gap: 32px; } }
+        
+        .main-control { width: 72px; height: 72px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+        @media (min-width: 768px) { .main-control { width: 80px; height: 80px; } }
+        
         .main-control.play { background: var(--accent-primary); box-shadow: 0 0 20px rgba(255, 71, 87, 0.4); }
         .main-control.pause { background: rgba(255,255,255,0.1); }
         .main-control:hover { transform: scale(1.1); }
-        .reset-btn, .next-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; }
+        .reset-btn, .next-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 12px; }
         .reset-btn:hover, .next-btn:hover { color: white; }
 
         .settings-panel { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; background: rgba(255, 255, 255, 0.03); padding: 16px; border-radius: 16px; }
         .setting-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; text-align: center; }
-        .setting-group input { text-align: center; padding: 8px; }
+        .setting-group input { text-align: center; padding: 8px; font-size: 1rem; }
 
         @media (max-width: 600px) {
-          .timer-text { font-size: 5rem; }
-          .fullscreen .timer-text { font-size: 8rem; }
+          .timer-card { padding: 24px; gap: 32px; }
+          .mode-btn { padding: 8px 12px; font-size: 0.75rem; }
           .task-header-row { grid-template-columns: 1fr; }
         }
+
       `}</style>
     </div>
   );
