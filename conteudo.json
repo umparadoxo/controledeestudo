@@ -1,0 +1,283 @@
+{
+    "cronograma": [
+        {
+            "disciplina": "Vendas e negociação",
+            "assuntos": [
+                {
+                    "prioridade": "ALTA",
+                    "topicos": [
+                        "Processo de vendas: etapas (prospecção → abordagem → levantamento de necessidades → proposta → objeção → fechamento → pós-venda)",
+                        "Técnicas de negociação: princípios ganha-ganha, BATNA/MAANA, concessões e limites",
+                        "Comportamento do consumidor: necessidades, desejos, processo de decisão de compra",
+                        "Cross-selling e up-selling no contexto bancário",
+                        "Atendimento e relacionamento com o cliente: qualidade, satisfação, fidelização, momentos da verdade"
+                    ]
+                },
+                {
+                    "prioridade": "MÉDIA",
+                    "topicos": [
+                        "Suitability — adequação de produtos ao perfil do investidor (conservador, moderado, arrojado)",
+                        "Funil de vendas e taxa de conversão",
+                        "Gestão de carteira e segmentação de clientes (varejo, alta renda, PJ)",
+                        "Técnicas de persuasão: reciprocidade, comprometimento, prova social, autoridade, escassez",
+                        "Tratamento de objeções: técnica do contorno e do reencadreamento"
+                    ]
+                },
+                {
+                    "prioridade": "BAIXA",
+                    "topicos": [
+                        "KPIs de vendas: volume, ticket médio, churn, NPS",
+                        "Planejamento comercial individual e metas",
+                        "Venda consultiva vs. transacional"
+                    ]
+                }
+            ]
+        },
+        {
+            "disciplina": "Informática",
+            "assuntos": [
+                {
+                    "prioridade": "ALTA",
+                    "topicos": [
+                        "Excel O365: SOMA, MÉDIA, SE, PROCV, CONT.SE, formatação condicional, filtros, gráficos, tabela dinâmica, atalhos",
+                        "Word O365: estilos, formatação, mala direta, revisão, controle de alterações, atalhos de teclado",
+                        "Navegadores Edge e Firefox: abas, favoritos, histórico, InPrivate/anônima, downloads, configurações de segurança, extensões",
+                        "Segurança da informação: CID (confidencialidade, integridade, disponibilidade) + autenticidade e irretratabilidade; phishing, malware, ransomware, engenharia social, firewall, antivírus"
+                    ]
+                },
+                {
+                    "prioridade": "MÉDIA",
+                    "topicos": [
+                        "Windows 10/11: gerenciamento de arquivos, Painel de Controle, atalhos (Ctrl+C/V/Z/A, Win+L, Alt+Tab), sistemas de arquivos NTFS/FAT32",
+                        "Outlook: configuração de conta, SMTP/POP3/IMAP, assinatura, regras, webmail",
+                        "Redes: LAN/WAN, HTTP/HTTPS/FTP, endereço IP, DNS, VPN",
+                        "PowerPoint O365: layouts, transições, animações, exportação",
+                        "Certificação digital e assinatura digital: ICP-Brasil, validade jurídica"
+                    ]
+                },
+                {
+                    "prioridade": "BAIXA",
+                    "topicos": [
+                        "Microsoft Teams, OneDrive, SharePoint — conceitos básicos de colaboração",
+                        "Backup: tipos (completo, incremental, diferencial), regra 3-2-1",
+                        "Banco de dados: tabelas, campos, registros, SQL básico (SELECT, FROM, WHERE)",
+                        "Redes sociais corporativas: uso profissional e políticas de privacidade"
+                    ]
+                }
+            ]
+        },
+        {
+            "disciplina": "Conhecimentos bancários",
+            "assuntos": [
+                {
+                    "prioridade": "ALTA",
+                    "topicos": [
+                        "SFN — estrutura completa: normativos (CMN), supervisores (Bacen, CVM, Susep, Previc), operadores (bancos, corretoras, seguradoras, fintechs)",
+                        "Banco Central: funções (emissor, banco dos bancos, gestor de reservas), instrumentos de política monetária (Selic, compulsório, mercado aberto)",
+                        "Produtos de captação: conta corrente, poupança, CDB, LCI, LCA — características, rentabilidade, FGC",
+                        "Lavagem de dinheiro: Lei 9.613/1998, fases (colocação, ocultação, integração), obrigações das IFs, COAF"
+                    ]
+                },
+                {
+                    "prioridade": "MÉDIA",
+                    "topicos": [
+                        "Crédito: pessoal, consignado, imobiliário, cheque especial, cartão — spread, garantias, análise de risco",
+                        "Fundos de investimento: renda fixa, multimercado, ações, cambial — taxas, come-cotas, classificação ANBIMA",
+                        "Mercado de capitais: ações ON/PN, debêntures, B3, mercado primário e secundário",
+                        "Câmbio: taxa de câmbio, câmbio manual e sacado, PTAX, remessas internacionais",
+                        "LGPD no setor bancário: dados pessoais e sensíveis, bases legais, direitos do titular"
+                    ]
+                },
+                {
+                    "prioridade": "BAIXA",
+                    "topicos": [
+                        "Previdência privada: PGBL vs. VGBL, tributação, portabilidade",
+                        "Open finance: fases de implementação, consentimento, portabilidade de dados",
+                        "Pix: funcionamento, tipos de chave, limites, QR Code, segurança",
+                        "Sigilo bancário: LC 105/2001 — quando pode e não pode ser quebrado"
+                    ]
+                }
+            ]
+        },
+        {
+            "disciplina": "Língua portuguesa",
+            "assuntos": [
+                {
+                    "prioridade": "ALTA",
+                    "topicos": [
+                        "Interpretação de texto: ideia central, inferência, pressuposto, intertextualidade, coesão e coerência",
+                        "Colocação pronominal: próclise, mesóclise, ênclise — regras e casos proibidos",
+                        "Concordância verbal: sujeito composto, coletivo, expressões partitivas, pronomes relativos",
+                        "Concordância nominal: casos especiais (meio, mesmo, anexo, obrigado, próprio, bastante)"
+                    ]
+                },
+                {
+                    "prioridade": "MÉDIA",
+                    "topicos": [
+                        "Regência verbal: assistir, visar, aspirar, obedecer, implicar, preferir, informar",
+                        "Regência nominal: nomes que exigem preposição específica",
+                        "Crase: casos obrigatórios, proibidos e facultativos",
+                        "Pontuação: vírgula (obrigatória e proibida), ponto e vírgula, dois-pontos, travessão",
+                        "Morfologia: pronomes pessoais, relativos, indefinidos e demonstrativos"
+                    ]
+                },
+                {
+                    "prioridade": "BAIXA",
+                    "topicos": [
+                        "Sintaxe: período composto por coordenação e subordinação",
+                        "Semântica: sinonímia, antonímia, polissemia, denotação e conotação",
+                        "Figuras de linguagem: metáfora, metonímia, hipérbole, eufemismo, ironia",
+                        "Ortografia: por que/porque/porquê/por quê, onde/aonde, mal/mau, mas/mais/mais"
+                    ]
+                }
+            ]
+        },
+        {
+            "disciplina": "Matemática financeira",
+            "assuntos": [
+                {
+                    "prioridade": "ALTA",
+                    "topicos": [
+                        "Juros simples: J = C·i·t / M = C·(1+i·t) — capital, taxa, tempo, montante, equivalência de taxas",
+                        "Juros compostos: M = C·(1+i)^n — capitalização, diferença prática com juros simples",
+                        "Desconto simples: comercial (por fora) e racional (por dentro) — fórmulas e diferenças"
+                    ]
+                },
+                {
+                    "prioridade": "MÉDIA",
+                    "topicos": [
+                        "Porcentagem aplicada: aumento e desconto em cadeia, variação percentual",
+                        "Séries de pagamento uniformes (anuidades): valor presente e futuro — conceito e fórmula",
+                        "Desconto composto: fórmula e aplicações"
+                    ]
+                },
+                {
+                    "prioridade": "BAIXA",
+                    "topicos": [
+                        "SAC vs. Price: conceito, diferença prática — como a prestação evolui em cada sistema",
+                        "Taxa nominal vs. efetiva: conversão e equivalência entre períodos"
+                    ]
+                }
+            ]
+        },
+        {
+            "disciplina": "Matemática básica",
+            "assuntos": [
+                {
+                    "prioridade": "ALTA",
+                    "topicos": [
+                        "Porcentagem: cálculo, aumento e desconto, variação percentual, sucessão de percentuais",
+                        "Razão e proporção: grandezas direta e inversamente proporcionais, regra de três simples e composta",
+                        "Equações do 1º e 2º grau: resolution e aplicação em problemas"
+                    ]
+                },
+                {
+                    "prioridade": "MÉDIA",
+                    "topicos": [
+                        "Estatística: média simples e ponderada, mediana, moda, interpretação de gráficos e tabelas",
+                        "Potenciação e radiciação: propriedades e simplificação de expressões",
+                        "Divisibilidade: critérios, MMC e MDC"
+                    ]
+                },
+                {
+                    "prioridade": "BAIXA",
+                    "topicos": [
+                        "Probabilidade: espaço amostral, evento simples, probabilidade condicional",
+                        "Análise combinatória: princípio fundamental da contagem, permutação e combinação"
+                    ]
+                }
+            ]
+        },
+        {
+            "disciplina": "Atualidades do mercado financeiro",
+            "assuntos": [
+                {
+                    "prioridade": "MAIOR INCIDÊNCIA",
+                    "topicos": [
+                        "Transformação digital no setor bancário: fintechs, bancos digitais, APIs, inteligência artificial nos serviços financeiros",
+                        "Funções da moeda: meio de troca, reserva de valor, unidade de conta",
+                        "Open banking / open finance: conceito, fases no Brasil, consentimento, portabilidade de dados",
+                        "Pix: funcionamento, chaves, QR Code estático e dinâmico, limites, Pix Parcelado, segurança",
+                        "Internet banking e mobile banking: tendências, riscos, autenticação em dois fatores"
+                    ]
+                },
+                {
+                    "prioridade": "COMPLEMENTARES",
+                    "topicos": [
+                        "ESG no setor financeiro: finanças sustentáveis, green bonds, taxonomia verde",
+                        "Correspondentes bancários: papel, regulação Bacen, inclusão financeira",
+                        "Criptomoedas e Real Digital: regulação no Brasil, CBDC",
+                        "Segurança cibernética bancária: LGPD, Resolução CMN 4.893/2021, golpes frequentes"
+                    ]
+                }
+            ]
+        },
+        {
+            "disciplina": "Língua inglesa",
+            "assuntos": [
+                {
+                    "prioridade": "ALTA",
+                    "topicos": [
+                        "Reading comprehension: ideia principal, inferência de significado pelo contexto, informação explícita",
+                        "Vocabulário financeiro: assets, liabilities, equity, interest rate, bonds, shares, dividend, portfolio, merger, fiscal/monetary policy",
+                        "Inferência de vocabulário desconhecido pelo contexto do texto"
+                    ]
+                },
+                {
+                    "prioridade": "MÉDIA",
+                    "topicos": [
+                        "Coesão textual: pronomes de referência (it, they, this, that), conectivos (however, therefore, although, despite, whereas)",
+                        "Reconhecimento de tempos verbais na leitura: simple present/past, present perfect, future",
+                        "Formação de palavras: prefixos (un-, re-, pre-, mis-) e sufixos (-tion, -ment, -ness, -ity, -ous)"
+                    ]
+                },
+                {
+                    "prioridade": "BAIXA",
+                    "topicos": [
+                        "Falsos cognatos: actually (na verdade), eventually (finalmente), pretend (fingir), sensible (sensato)",
+                        "Voz passiva e discurso indireto: reconhecimento e interpretação"
+                    ]
+                }
+            ]
+        },
+        {
+            "disciplina": "Revisão do dia anterior",
+            "assuntos": [
+                {
+                    "prioridade": "REVISÃO",
+                    "topicos": [
+                        "Reforço de conceitos",
+                        "Mapa mental",
+                        "Flashcards"
+                    ]
+                }
+            ]
+        },
+        {
+            "disciplina": "Bateria de questões",
+            "assuntos": [
+                {
+                    "prioridade": "PRÁTICA",
+                    "topicos": [
+                        "Questões CESGRANRIO",
+                        "Simulados rápidos",
+                        "Erros frequentes"
+                    ]
+                }
+            ]
+        },
+        {
+            "disciplina": "Simulado",
+            "assuntos": [
+                {
+                    "prioridade": "TESTE",
+                    "topicos": [
+                        "Simulado Completo",
+                        "Gestão de Tempo",
+                        "Redação"
+                    ]
+                }
+            ]
+        }
+    ]
+}
