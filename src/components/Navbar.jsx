@@ -11,64 +11,6 @@ const Navbar = ({ activeTab, setActiveTab, userEmail }) => {
     return `${year}-${month}-${day}`;
   };
 
-  const [stats, setStats] = useState({ today: 0, streak: 0, totalTime: '0h0m', totalPomodoros: 0 });
-
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data: sessionData } = await supabase
-      .from('pomodoro_sessions')
-      .select('duration_minutes, completed_at')
-      .order('completed_at', { ascending: true });
-
-    if (!sessionData) return;
-
-    // Today's count
-    const todayStr = getLocalDateString();
-    const todayCount = sessionData.filter(s => s.completed_at.startsWith(todayStr)).length;
-
-    // Total time
-    const totalMinutes = sessionData.reduce((acc, s) => acc + s.duration_minutes, 0);
-    const h = Math.floor(totalMinutes / 60);
-    const m = totalMinutes % 60;
-
-    // Streak calculation
-    let currentStreak = 0;
-    let checkDate = new Date();
-    
-    while (true) {
-      const dateStr = getLocalDateString(checkDate);
-      const hasSession = sessionData.some(s => s.completed_at.startsWith(dateStr));
-      
-      if (hasSession) {
-        currentStreak++;
-        checkDate = subDays(checkDate, 1);
-      } else {
-        if (currentStreak === 0 && isSameDay(checkDate, new Date())) {
-          checkDate = subDays(checkDate, 1);
-          continue;
-        }
-        break;
-      }
-    }
-
-    setStats({ 
-      today: todayCount, 
-      streak: currentStreak, 
-      totalTime: `${h}h${m}m`,
-      totalPomodoros: sessionData.length
-    });
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-  };
-
   const navItems = [
     { id: 'dashboard', label: 'Painel', icon: LayoutDashboard },
     { id: 'timer', label: 'Pomodoro', icon: Timer },
@@ -78,71 +20,30 @@ const Navbar = ({ activeTab, setActiveTab, userEmail }) => {
 
   return (
     <>
-      {/* Mobile Top Header (Stats only) */}
-      <header className="mobile-header desktop-hide">
-        <div className="status-scroll">
-          <div className="status-pill status-red">
-            <span className="status-icon">🍅</span>
-            <span>{stats.today} hoje</span>
-          </div>
-          <div className="status-pill status-yellow">
-            <Flame size={14} fill="currentColor" />
-            <span>{stats.streak} dias</span>
-          </div>
-          <div className="status-pill status-blue">
-            <Timer size={14} />
-            <span>{stats.totalPomodoros} total</span>
-          </div>
-          <div className="status-pill status-green">
-            <Clock size={14} />
-            <span>{stats.totalTime}</span>
-          </div>
-        </div>
-      </header>
-
       {/* Desktop Top Navbar */}
       <nav className="navbar glass-card mobile-hide">
-        <div className="nav-left">
-          <div className="status-pill status-red">
-            <span className="status-icon">🍅</span>
-            <span>{stats.today} hoje</span>
-          </div>
-          <div className="status-pill status-yellow">
-            <Flame size={16} fill="currentColor" />
-            <span>{stats.streak} dias</span>
-          </div>
-          <div className="status-pill status-blue">
-            <Timer size={14} />
-            <span>{stats.totalPomodoros} pomodoros</span>
-          </div>
-          <div className="status-pill status-green">
-            <Clock size={16} />
-            <span>{stats.totalTime} estudadas</span>
+        <div className="nav-left-placeholder" style={{ flex: 1 }}></div>
+
+        <div className="nav-center" style={{ flex: 2, display: 'flex', justifyContent: 'center' }}>
+          <div className="nav-center-wrapper" style={{ display: 'flex', gap: '4px', background: 'rgba(255, 255, 255, 0.03)', padding: '4px', borderRadius: '100px' }}>
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`nav-btn ${activeTab === item.id ? 'active' : ''}`}
+              >
+                <item.icon size={18} />
+                <span>{item.label}</span>
+              </button>
+            ))}
           </div>
         </div>
 
-        <div className="nav-center">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`nav-btn ${activeTab === item.id ? 'active' : ''}`}
-            >
-              <item.icon size={18} />
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="nav-right">
+        <div className="nav-right" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '12px' }}>
           <div className="user-info">
             <User size={16} />
             <span className="user-email">{userEmail}</span>
           </div>
-          <button className="logout-btn" onClick={handleLogout}>
-            <LogOut size={18} />
-            <span>Sair</span>
-          </button>
         </div>
       </nav>
 
@@ -157,9 +58,6 @@ const Navbar = ({ activeTab, setActiveTab, userEmail }) => {
             <item.icon size={26} color={activeTab === item.id ? '#ff4757' : '#747d8c'} strokeWidth={activeTab === item.id ? 2.5 : 2} />
           </button>
         ))}
-        <button className="mobile-nav-btn" onClick={handleLogout}>
-          <LogOut size={26} color="#747d8c" />
-        </button>
       </nav>
 
       <style jsx>{`
@@ -169,30 +67,6 @@ const Navbar = ({ activeTab, setActiveTab, userEmail }) => {
           background: rgba(12, 13, 16, 0.8); border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .mobile-header {
-          padding: 12px 16px; position: sticky; top: 0; z-index: 100;
-          background: rgba(12, 13, 16, 0.9); backdrop-filter: blur(10px);
-          border-bottom: 1px solid var(--border-color);
-        }
-
-        .status-scroll { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
-        .status-scroll::-webkit-scrollbar { display: none; }
-
-        .status-pill {
-          display: flex; align-items: center; gap: 6px; padding: 6px 12px;
-          border-radius: 100px; font-size: 0.75rem; font-weight: 700;
-          white-space: nowrap; border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .status-red { background: rgba(255, 71, 87, 0.1); color: #ff4757; }
-        .status-yellow { background: rgba(255, 165, 2, 0.1); color: #ffa502; }
-        .status-green { background: rgba(46, 213, 115, 0.1); color: #2ed573; }
-        .status-blue { background: rgba(30, 144, 255, 0.1); color: #1e90ff; }
-
-
-        .nav-left { display: flex; gap: 8px; align-items: center; }
-        .nav-center { display: flex; gap: 4px; background: rgba(255, 255, 255, 0.03); padding: 4px; border-radius: 100px; }
-        
         .nav-btn {
           display: flex; align-items: center; gap: 8px; padding: 8px 16px;
           border-radius: 100px; border: none; background: transparent;
@@ -201,7 +75,6 @@ const Navbar = ({ activeTab, setActiveTab, userEmail }) => {
         }
         .nav-btn.active { background: var(--accent-primary); color: white; }
 
-        .nav-right { display: flex; align-items: center; gap: 12px; }
         .user-info { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); padding: 6px 14px; border-radius: 100px; font-size: 0.85rem; }
         
         .logout-btn {

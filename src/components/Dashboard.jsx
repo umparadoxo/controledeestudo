@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { format, eachDayOfInterval, isSameDay, subDays, startOfWeek } from 'date-fns';
-import { TrendingUp, Flame, Clock, Calendar, ChevronRight, CheckCircle2, Circle, BarChart2 } from 'lucide-react';
+import { TrendingUp, Flame, Clock, Calendar, ChevronRight, CheckCircle2, Circle, BarChart2, LogOut } from 'lucide-react';
+import conteudo from '../../conteudo.json';
 
 const Dashboard = ({ onStartPomodoro }) => {
   const getLocalDateString = (date = new Date()) => {
@@ -17,7 +18,7 @@ const Dashboard = ({ onStartPomodoro }) => {
   const [selectedDay, setSelectedDay] = useState(todayIndex);
   const [sessions, setSessions] = useState([]);
   const [allPlans, setAllPlans] = useState([]);
-  const [stats, setStats] = useState({ streak: 0, totalHours: 0, weekPomodoros: 0 });
+  const [stats, setStats] = useState({ streak: 0, totalHours: 0, weekPomodoros: 0, today: 0, totalSessions: 0 });
   const [loadingAction, setLoadingAction] = useState(null);
 
   useEffect(() => {
@@ -63,13 +64,17 @@ const Dashboard = ({ onStartPomodoro }) => {
 
   const calculateStats = (data) => {
     if (data.length === 0) {
-      setStats({ streak: 0, totalHours: 0, weekPomodoros: 0 });
+      setStats({ streak: 0, totalHours: 0, weekPomodoros: 0, today: 0, totalSessions: 0 });
       return;
     }
 
     const totalMinutes = data.reduce((acc, s) => acc + s.duration_minutes, 0);
     const totalHours = (totalMinutes / 60).toFixed(1);
     
+    // Today's count
+    const todayStr = getLocalDateString();
+    const todayCount = data.filter(s => s.completed_at.startsWith(todayStr)).length;
+
     // Week count logic
     const startOfCurrentWeek = startOfWeek(new Date(), { weekStartsOn: 0 }); // Sun-Sat
     const weekCount = data.filter(s => new Date(s.completed_at) >= startOfCurrentWeek).length;
@@ -93,7 +98,17 @@ const Dashboard = ({ onStartPomodoro }) => {
       }
     }
 
-    setStats({ streak: currentStreak, totalHours, weekPomodoros: weekCount });
+    setStats({ 
+      streak: currentStreak, 
+      totalHours, 
+      weekPomodoros: weekCount, 
+      today: todayCount,
+      totalSessions: data.length 
+    });
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
   };
 
   const handleQuickCheck = async (plan, index) => {
@@ -165,8 +180,89 @@ const Dashboard = ({ onStartPomodoro }) => {
     return 'rgba(255, 71, 87, 1)';
   };
 
+  const disciplineStats = React.useMemo(() => {
+    const statsMap = {};
+    let totalMinutes = 0;
+    const excluded = [
+      'Revisão do dia anterior',
+      'Bateria de questões',
+      'Simulado',
+      'Atualidades do mercado financeiro'
+    ].map(name => cleanName(name));
+
+    // Initialize with all disciplines from conteudo.json (excluding the specific ones)
+    (conteudo.cronograma || []).forEach(item => {
+      const name = cleanName(item.disciplina);
+      if (name && !excluded.includes(name)) statsMap[name] = 0;
+    });
+
+    // Add sessions and account for any custom disciplines not in conteudo.json (excluding specific ones)
+    sessions.forEach(s => {
+      const name = s.discipline;
+      if (name && name.trim() !== '' && !excluded.includes(name)) {
+        statsMap[name] = (statsMap[name] || 0) + s.duration_minutes;
+        totalMinutes += s.duration_minutes;
+      }
+    });
+
+    const entries = Object.entries(statsMap);
+    if (totalMinutes === 0) {
+      return entries
+        .map(([name, minutes]) => ({ name, minutes, percentage: 0 }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    return entries
+      .map(([name, minutes]) => ({
+        name,
+        minutes,
+        percentage: parseFloat(((minutes / totalMinutes) * 100).toFixed(1))
+      }))
+      .sort((a, b) => b.minutes - a.minutes || a.name.localeCompare(b.name));
+  }, [sessions]);
+
   return (
     <div className="dashboard-container animate-fade-in">
+      <div className="glass-card section-card stats-overview-card">
+        <div className="section-header">
+          <h3>Resumo de Estudos</h3>
+          <button className="logout-action-btn" onClick={handleLogout}>
+            <LogOut size={16} />
+            <span>Sair</span>
+          </button>
+        </div>
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-icon red"><span style={{ fontSize: '1.2rem' }}>🍅</span></div>
+            <div className="stat-info">
+              <h3>{stats.today}</h3>
+              <p>Hoje</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon yellow"><Flame size={22} fill="currentColor" /></div>
+            <div className="stat-info">
+              <h3>{stats.streak}</h3>
+              <p>Dias Seguidos</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon blue"><BarChart2 size={22} /></div>
+            <div className="stat-info">
+              <h3>{stats.totalSessions}</h3>
+              <p>Total Sessões</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon green"><Clock size={22} /></div>
+            <div className="stat-info">
+              <h3>{stats.totalHours}h</h3>
+              <p>Tempo Total</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="dashboard-main">
         <div className="glass-card section-card">
           <div className="section-header">
@@ -211,20 +307,46 @@ const Dashboard = ({ onStartPomodoro }) => {
             <div className="legend-cells"><div className="heatmap-cell" style={{ backgroundColor: 'rgba(255, 71, 87, 0.2)' }} /><div className="heatmap-cell" style={{ backgroundColor: 'rgba(255, 71, 87, 0.5)' }} /><div className="heatmap-cell" style={{ backgroundColor: 'rgba(255, 71, 87, 0.8)' }} /></div>
             <span>Muito</span>
           </div>
+
+          <div className="discipline-ranking">
+            <div className="section-header" style={{ marginTop: '32px', paddingTop: '20px', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+              <h3>Distribuição</h3>
+              <span className="subtitle">Ranking de estudos</span>
+            </div>
+            <div className="stats-list">
+              {disciplineStats.length > 0 ? disciplineStats.map((stat, i) => (
+                <div key={i} className="stat-row">
+                  <div className="stat-info-row">
+                    <span className="stat-name">{stat.name}</span>
+                    <span className="stat-percentage">{stat.percentage}%</span>
+                  </div>
+                  <div className="progress-bar-bg">
+                    <div className="progress-bar-fill" style={{ width: `${stat.percentage}%` }}></div>
+                  </div>
+                </div>
+              )) : (
+                <div className="no-data">Inicie um pomodoro para ver as estatísticas.</div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
       <style jsx>{`
         .dashboard-container { display: flex; flex-direction: column; gap: 24px; padding-bottom: 20px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
-        .stat-card { padding: 16px; display: flex; align-items: center; gap: 16px; border-radius: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .stat-card { 
+          padding: 16px; display: flex; align-items: center; gap: 14px; border-radius: 20px; 
+          background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);
+        }
         .stat-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .stat-info h3 { font-size: 1.2rem; margin: 0; }
-        .stat-info p { font-size: 0.75rem; margin: 0; }
+        .stat-info h3 { font-size: 1.2rem; margin: 0; font-weight: 700; }
+        .stat-info p { font-size: 0.7rem; margin: 0; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
         
         .stat-icon.red { background: rgba(255, 71, 87, 0.1); color: #ff4757; }
         .stat-icon.blue { background: rgba(30, 144, 255, 0.1); color: #1e90ff; }
         .stat-icon.green { background: rgba(46, 213, 115, 0.1); color: #2ed573; }
+        .stat-icon.yellow { background: rgba(255, 165, 2, 0.1); color: #ffa502; }
         
         .dashboard-main { display: grid; grid-template-columns: 1fr; gap: 16px; }
         @media (min-width: 1100px) { .dashboard-main { grid-template-columns: 1.5fr 1fr; gap: 24px; } }
@@ -260,9 +382,29 @@ const Dashboard = ({ onStartPomodoro }) => {
         .start-btn-sm { padding: 10px 16px; font-size: 0.8rem; border-radius: 12px; font-weight: 700; flex-shrink: 0; }
         .no-plan { text-align: center; color: var(--text-muted); padding: 20px; }
 
+        .logout-action-btn {
+          display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+          background: rgba(255, 71, 87, 0.1); border: 1px solid rgba(255, 71, 87, 0.2);
+          color: #ff4757; border-radius: 100px; cursor: pointer; transition: all 0.2s;
+          font-size: 0.85rem; font-weight: 600;
+        }
+        .logout-action-btn:hover { background: rgba(255, 71, 87, 0.2); transform: translateY(-1px); }
+        .logout-action-btn span { color: #ff4757; }
+
+        .discipline-ranking { margin-top: 10px; }
+        .stats-list { display: flex; flex-direction: column; gap: 16px; }
+        .stat-row { display: flex; flex-direction: column; gap: 8px; }
+        .stat-info-row { display: flex; justify-content: space-between; align-items: center; }
+        .stat-name { font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; }
+        .stat-percentage { font-size: 0.9rem; color: #ff4757; font-weight: 700; }
+        .progress-bar-bg { height: 8px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #ff4757, #ff6b81); border-radius: 4px; }
+        .no-data { text-align: center; color: var(--text-muted); padding: 10px; font-size: 0.85rem; }
+
         @media (max-width: 600px) {
-          .stats-grid { grid-template-columns: 1fr; }
-          .stat-card { padding: 20px; }
+          .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+          .stat-card { padding: 12px; gap: 10px; }
+          .stat-info h3 { font-size: 1.1rem; }
           .section-card { padding: 16px; }
           .plan-item { gap: 8px; }
           .discipline-full-name { font-size: 0.95rem; }
