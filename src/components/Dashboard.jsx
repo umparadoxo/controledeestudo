@@ -173,7 +173,7 @@ const Dashboard = ({ onStartPomodoro }) => {
   const getHeatColor = (date) => {
     const dateStr = getLocalDateString(date);
     const count = sessions.filter(s => s.completed_at.startsWith(dateStr)).length;
-    if (count === 0) return 'rgba(255, 255, 255, 0.03)';
+    if (count === 0) return 'var(--accent-secondary)';
     if (count < 2) return 'rgba(255, 71, 87, 0.2)';
     if (count < 4) return 'rgba(255, 71, 87, 0.4)';
     if (count < 6) return 'rgba(255, 71, 87, 0.7)';
@@ -309,7 +309,7 @@ const Dashboard = ({ onStartPomodoro }) => {
           </div>
 
           <div className="discipline-ranking">
-            <div className="section-header" style={{ marginTop: '32px', paddingTop: '20px', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+            <div className="section-header" style={{ marginTop: '32px', paddingTop: '20px', borderTop: '1px solid var(--border-color)' }}>
               <h3>Distribuição</h3>
               <span className="subtitle">Ranking de estudos</span>
             </div>
@@ -331,16 +331,15 @@ const Dashboard = ({ onStartPomodoro }) => {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
+       <style jsx>{`
         .dashboard-container { display: flex; flex-direction: column; gap: 24px; padding-bottom: 20px; }
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         .stat-card { 
           padding: 16px; display: flex; align-items: center; gap: 14px; border-radius: 20px; 
-          background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);
+          background: var(--surface-color); border: 1px solid var(--border-color);
         }
         .stat-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .stat-info h3 { font-size: 1.2rem; margin: 0; font-weight: 700; }
+        .stat-info h3 { font-size: 1.2rem; margin: 0; font-weight: 700; color: var(--text-primary); }
         .stat-info p { font-size: 0.7rem; margin: 0; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
         
         .stat-icon.red { background: rgba(255, 71, 87, 0.1); color: #ff4757; }
@@ -352,6 +351,7 @@ const Dashboard = ({ onStartPomodoro }) => {
         @media (min-width: 1100px) { .dashboard-main { grid-template-columns: 1.5fr 1fr; gap: 24px; } }
         
         .section-card { padding: 20px; border-radius: 24px; }
+        .section-header h3 { color: var(--text-primary); }
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .subtitle { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
         
@@ -362,7 +362,7 @@ const Dashboard = ({ onStartPomodoro }) => {
         
         .plans-list { display: flex; flex-direction: column; gap: 10px; }
         .plan-item { 
-          padding: 12px; background: rgba(255, 255, 255, 0.03); 
+          padding: 12px; background: var(--surface-color); 
           border: 1px solid var(--border-color); border-radius: 18px; 
           display: flex; align-items: center; gap: 12px;
           min-height: 72px;
@@ -371,16 +371,17 @@ const Dashboard = ({ onStartPomodoro }) => {
         
         .check-btn { 
           width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
-          background: rgba(255, 255, 255, 0.05); border: none; color: var(--text-muted); border-radius: 12px; cursor: pointer; 
+          background: var(--accent-secondary); border: none; color: var(--text-muted); border-radius: 12px; cursor: pointer; 
         }
         .check-btn.checked { color: var(--success); background: rgba(46, 213, 115, 0.1); }
         
         .plan-topic { flex: 1; overflow: hidden; }
-        .discipline-full-name { font-size: 1rem; font-weight: 600; color: white; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .discipline-full-name { font-size: 1rem; font-weight: 600; color: var(--text-primary); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .completed .discipline-full-name { text-decoration: line-through; color: var(--text-muted); }
         
         .start-btn-sm { padding: 10px 16px; font-size: 0.8rem; border-radius: 12px; font-weight: 700; flex-shrink: 0; }
         .no-plan { text-align: center; color: var(--text-muted); padding: 20px; }
+        .no-data { text-align: center; color: var(--text-muted); padding: 20px; }
 
         .logout-action-btn {
           display: flex; align-items: center; gap: 8px; padding: 8px 16px;
@@ -397,7 +398,7 @@ const Dashboard = ({ onStartPomodoro }) => {
         .stat-info-row { display: flex; justify-content: space-between; align-items: center; }
         .stat-name { font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; }
         .stat-percentage { font-size: 0.9rem; color: #ff4757; font-weight: 700; }
-        .progress-bar-bg { height: 8px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; }
+        .progress-bar-bg { height: 8px; background: var(--accent-secondary); border-radius: 4px; overflow: hidden; }
         .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #ff4757, #ff6b81); border-radius: 4px; }
         .no-data { text-align: center; color: var(--text-muted); padding: 10px; font-size: 0.85rem; }
 

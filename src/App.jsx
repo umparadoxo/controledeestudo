@@ -9,6 +9,29 @@ import Navbar from './components/Navbar';
 import './index.css';
 
 const AuthContext = createContext({});
+const ThemeContext = createContext({});
+
+export const ThemeProvider = ({ children }) => {
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+  };
+
+  useEffect(() => {
+    document.body.className = theme === 'light' ? 'light-theme' : '';
+  }, [theme]);
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
+export const useTheme = () => useContext(ThemeContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -38,6 +61,7 @@ export const useAuth = () => useContext(AuthContext);
 
 function App() {
   const { user, loading } = useAuth();
+  const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [initialTask, setInitialTask] = useState(null);
@@ -48,7 +72,14 @@ function App() {
   };
 
   if (loading) return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'white' }}>
+    <div style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      height: '100vh', 
+      color: theme === 'light' ? '#1e293b' : 'white',
+      backgroundColor: theme === 'light' ? '#f8fafc' : '#0c0d10'
+    }}>
       Carregando...
     </div>
   );
@@ -86,8 +117,10 @@ function App() {
 
 export default function AppWrapper() {
   return (
-    <AuthProvider>
-      <App />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

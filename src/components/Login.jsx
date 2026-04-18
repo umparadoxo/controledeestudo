@@ -123,7 +123,7 @@ const Login = () => {
 
         .card-header { text-align: center; }
         .logo-icon { font-size: 3rem; margin-bottom: 16px; display: block; }
-        .card-header h2 { font-size: 1.75rem; color: white; margin-bottom: 8px; }
+        .card-header h2 { font-size: 1.75rem; color: var(--text-primary); margin-bottom: 8px; }
         .card-header p { font-size: 0.95rem; color: var(--text-muted); }
 
         form { display: flex; flex-direction: column; gap: 20px; }

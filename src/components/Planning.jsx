@@ -147,9 +147,9 @@ const Planning = () => {
                       value={task.discipline} 
                       onChange={(e) => handleTaskChange(day.day_of_week, idx, e.target.value)}
                     >
-                      <option value="" style={{backgroundColor: '#0c0d10', color: 'white'}}>Selecione...</option>
+                      <option value="">Selecione...</option>
                       {conteudo.cronograma.map((bg, i) => (
-                        <option key={i} value={bg.disciplina} style={{backgroundColor: '#0c0d10', color: 'white'}}>{bg.disciplina}</option>
+                        <option key={i} value={bg.disciplina}>{bg.disciplina}</option>
                       ))}
                     </select>
                   </div>
@@ -182,19 +182,19 @@ const Planning = () => {
         
         .remove-task-btn { 
           position: absolute; top: -10px; right: -10px; width: 28px; height: 28px; border-radius: 50%;
-          border: 1px solid var(--border-color); background: #1a1b1e; color: #ff4757;
+          border: 1px solid var(--border-color); background: var(--accent-secondary); color: #ff4757;
           display: flex; align-items: center; justify-content: center; cursor: pointer;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 5;
+          box-shadow: var(--card-shadow); z-index: 5;
         }
 
         .add-task-btn {
           display: flex; align-items: center; justify-content: center; gap: 8px;
-          background: rgba(255,255,255,0.03); border: 1px dashed var(--border-color); color: var(--text-secondary);
+          background: var(--input-bg); border: 1px dashed var(--border-color); color: var(--text-secondary);
           padding: 12px; border-radius: 12px; cursor: pointer; font-size: 0.85rem;
           min-height: 44px;
         }
-        .add-task-btn:hover { background: rgba(255, 255, 255, 0.05); color: white; }
-        .loading { display: flex; justify-content: center; align-items: center; height: 300px; color: white; }
+        .add-task-btn:hover { background: var(--accent-secondary); color: var(--text-primary); }
+        .loading { display: flex; justify-content: center; align-items: center; height: 300px; color: var(--text-primary); }
 
       `}</style>
     </div>

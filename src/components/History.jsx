@@ -215,16 +215,16 @@ const History = () => {
 
         .history-list { padding: 24px; overflow: hidden; }
         .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .count-badge { background: rgba(255, 255, 255, 0.05); padding: 4px 12px; border-radius: 100px; font-size: 0.8rem; color: var(--text-secondary); }
+        .count-badge { background: var(--accent-secondary); padding: 4px 12px; border-radius: 100px; font-size: 0.8rem; color: var(--text-secondary); }
 
         .sessions-table-wrapper { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; min-width: 400px; }
         th { text-align: left; padding: 12px; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
-        td { padding: 16px 12px; color: var(--text-secondary); border-bottom: 1px solid rgba(255, 255, 255, 0.03); font-size: 0.9rem; }
+        td { padding: 16px 12px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
         
         .date-cell, .duration-cell { display: flex; align-items: center; gap: 8px; }
         .topic-group { display: flex; flex-direction: column; gap: 4px; }
-        .discipline-text { color: white; font-weight: 600; font-size: 0.95rem; }
+        .discipline-text { color: var(--text-primary); font-weight: 600; font-size: 0.95rem; }
         .topic-subtext { color: var(--text-muted); font-size: 0.8rem; }
         
         .delete-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: color 0.2s; }

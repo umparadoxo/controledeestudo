@@ -15,6 +15,21 @@
   --glass-blur: blur(16px);
   --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --color-scheme: dark;
+}
+
+body.light-theme {
+  --bg-color: #f8fafc;
+  --surface-color: rgba(255, 255, 255, 0.8);
+  --border-color: rgba(0, 0, 0, 0.08);
+  --accent-secondary: #e2e8f0;
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  --input-bg: rgba(0, 0, 0, 0.03);
+  --color-scheme: light;
 }
 
 * {
@@ -30,8 +45,8 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(255, 71, 87, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(30, 144, 255, 0.15) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(255, 71, 87, 0.1) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(30, 144, 255, 0.1) 0px, transparent 50%);
 }
 
 #root {
@@ -67,7 +82,7 @@ body {
 }
 
 .glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: var(--accent-primary);
   transform: translateY(-2px);
 }
 
@@ -111,18 +126,18 @@ body {
 input, select, textarea {
   width: 100%;
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--input-bg);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  color: white;
+  color: var(--text-primary);
   outline: none;
   transition: var(--transition);
-  color-scheme: dark;
+  color-scheme: var(--color-scheme);
 }
 
 option {
-  background-color: #0c0d10;
-  color: white;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
 }
 
 input:focus {

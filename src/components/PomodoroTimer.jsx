@@ -175,7 +175,7 @@ const PomodoroTimer = ({ isFocusMode, setIsFocusMode, initialTask, onClearTask }
         <div className="timer-controls">
           <button className="reset-btn" onClick={resetTimer}><RotateCcw size={24} /></button>
           <button className={`main-control ${isActive ? 'pause' : 'play'}`} onClick={toggleTimer}>
-            {isActive ? <Pause size={32} fill="white" /> : <Play size={32} fill="white" />}
+            {isActive ? <Pause size={32} fill="currentColor" /> : <Play size={32} fill="currentColor" />}
           </button>
           <button className="next-btn" onClick={handleTimerComplete}><CheckCircle size={24} /></button>
         </div>
@@ -189,20 +189,20 @@ const PomodoroTimer = ({ isFocusMode, setIsFocusMode, initialTask, onClearTask }
         .task-field { display: flex; flex-direction: column; gap: 8px; }
         .task-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); display: flex; align-items: center; gap: 4px; font-weight: 700; }
         .task-select { 
-          background: rgba(0, 0, 0, 0.4); 
+          background: var(--input-bg); 
           border: 1px solid var(--border-color); 
-          color: white; 
+          color: var(--text-primary); 
           border-radius: 12px; 
           padding: 10px 14px; 
           font-size: 0.85rem; 
           cursor: pointer; 
-          color-scheme: dark;
+          color-scheme: var(--color-scheme);
           outline: none;
           transition: var(--transition);
         }
-        .task-select:focus { border-color: var(--accent-primary); background: rgba(0, 0, 0, 0.6); }
-        .dark-option { background-color: #0c0d10; color: white; }
-        .task-input-inline { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--accent-primary); color: white; border-radius: 8px; padding: 10px; width: 100%; outline: none; }
+        .task-select:focus { border-color: var(--accent-primary); background: var(--input-bg); }
+        .dark-option { background-color: var(--bg-color); color: var(--text-primary); }
+        .task-input-inline { background: var(--input-bg); border: 1px solid var(--accent-primary); color: var(--text-primary); border-radius: 8px; padding: 10px; width: 100%; outline: none; }
         
         .timer-card { width: 100%; max-width: 500px; padding: 32px; display: flex; flex-direction: column; align-items: center; gap: 40px; }
         .fullscreen .timer-card { max-width: 800px; background: transparent; border: none; box-shadow: none; }
@@ -226,7 +226,7 @@ const PomodoroTimer = ({ isFocusMode, setIsFocusMode, initialTask, onClearTask }
         .mode-btn.active.break { background: var(--success); color: white; box-shadow: 0 4px 12px rgba(46, 213, 115, 0.3); }
 
         .timer-display { text-align: center; margin: 10px 0; }
-        .timer-text { font-family: 'JetBrains Mono', monospace; font-size: 5rem; font-weight: 700; color: white; line-height: 1; }
+        .timer-text { font-family: 'JetBrains Mono', monospace; font-size: 5rem; font-weight: 700; color: var(--text-primary); line-height: 1; }
         .fullscreen .timer-text { font-size: 8rem; }
 
         @media (min-width: 768px) {
@@ -240,11 +240,11 @@ const PomodoroTimer = ({ isFocusMode, setIsFocusMode, initialTask, onClearTask }
         .main-control { width: 72px; height: 72px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
         @media (min-width: 768px) { .main-control { width: 80px; height: 80px; } }
         
-        .main-control.play { background: var(--accent-primary); box-shadow: 0 0 20px rgba(255, 71, 87, 0.4); }
-        .main-control.pause { background: rgba(255,255,255,0.1); }
+        .main-control.play { background: var(--accent-primary); color: white; box-shadow: 0 0 20px rgba(255, 71, 87, 0.4); }
+        .main-control.pause { background: var(--accent-secondary); color: var(--text-primary); }
         .main-control:hover { transform: scale(1.1); }
         .reset-btn, .next-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 12px; }
-        .reset-btn:hover, .next-btn:hover { color: white; }
+        .reset-btn:hover, .next-btn:hover { color: var(--text-primary); }
 
         .settings-panel { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; background: rgba(255, 255, 255, 0.03); padding: 16px; border-radius: 16px; }
         .setting-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; text-align: center; }
