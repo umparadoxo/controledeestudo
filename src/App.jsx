@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard';
 import PomodoroTimer from './components/PomodoroTimer';
 import Planning from './components/Planning';
 import History from './components/History';
+import Stats from './components/Stats';
 import Login from './components/Login';
 import Navbar from './components/Navbar';
 import './index.css';
@@ -108,6 +109,7 @@ function App() {
             />
           )}
           {activeTab === 'planning' && <Planning />}
+          {activeTab === 'stats' && <Stats />}
           {activeTab === 'history' && <History />}
         </div>
       </main>

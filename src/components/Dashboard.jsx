@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { format, eachDayOfInterval, isSameDay, subDays, startOfWeek } from 'date-fns';
-import { TrendingUp, Flame, Clock, Calendar, ChevronRight, CheckCircle2, Circle, BarChart2, LogOut } from 'lucide-react';
+import { TrendingUp, Flame, Clock, Calendar, ChevronRight, CheckCircle2, Circle, BarChart2, LogOut, Info } from 'lucide-react';
 import conteudo from '../../conteudo.json';
 
 const Dashboard = ({ onStartPomodoro }) => {
@@ -20,6 +20,7 @@ const Dashboard = ({ onStartPomodoro }) => {
   const [allPlans, setAllPlans] = useState([]);
   const [stats, setStats] = useState({ streak: 0, totalHours: 0, weekPomodoros: 0, today: 0, totalSessions: 0 });
   const [loadingAction, setLoadingAction] = useState(null);
+  const [timeFilter, setTimeFilter] = useState('all');
 
   useEffect(() => {
     fetchData();
@@ -176,60 +177,16 @@ const Dashboard = ({ onStartPomodoro }) => {
     if (count === 0) return 'var(--accent-secondary)';
     if (count < 2) return 'rgba(255, 71, 87, 0.2)';
     if (count < 4) return 'rgba(255, 71, 87, 0.4)';
-    if (count < 6) return 'rgba(255, 71, 87, 0.7)';
     return 'rgba(255, 71, 87, 1)';
   };
 
-  const disciplineStats = React.useMemo(() => {
-    const statsMap = {};
-    let totalMinutes = 0;
-    const excluded = [
-      'Revisão do dia anterior',
-      'Bateria de questões',
-      'Simulado',
-      'Atualidades do mercado financeiro'
-    ].map(name => cleanName(name));
-
-    // Initialize with all disciplines from conteudo.json (excluding the specific ones)
-    (conteudo.cronograma || []).forEach(item => {
-      const name = cleanName(item.disciplina);
-      if (name && !excluded.includes(name)) statsMap[name] = 0;
-    });
-
-    // Add sessions and account for any custom disciplines not in conteudo.json (excluding specific ones)
-    sessions.forEach(s => {
-      const name = s.discipline;
-      if (name && name.trim() !== '' && !excluded.includes(name)) {
-        statsMap[name] = (statsMap[name] || 0) + s.duration_minutes;
-        totalMinutes += s.duration_minutes;
-      }
-    });
-
-    const entries = Object.entries(statsMap);
-    if (totalMinutes === 0) {
-      return entries
-        .map(([name, minutes]) => ({ name, minutes, percentage: 0 }))
-        .sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    return entries
-      .map(([name, minutes]) => ({
-        name,
-        minutes,
-        percentage: parseFloat(((minutes / totalMinutes) * 100).toFixed(1))
-      }))
-      .sort((a, b) => b.minutes - a.minutes || a.name.localeCompare(b.name));
-  }, [sessions]);
 
   return (
     <div className="dashboard-container animate-fade-in">
+      {/* Overview Stats (Full Width) */}
       <div className="glass-card section-card stats-overview-card">
         <div className="section-header">
           <h3>Resumo de Estudos</h3>
-          <button className="logout-action-btn" onClick={handleLogout}>
-            <LogOut size={16} />
-            <span>Sair</span>
-          </button>
         </div>
         <div className="stats-grid">
           <div className="stat-card">
@@ -263,7 +220,9 @@ const Dashboard = ({ onStartPomodoro }) => {
         </div>
       </div>
 
+      {/* Main Grid: Planning and Evolution Side-by-Side */}
       <div className="dashboard-main">
+        {/* Planning Section */}
         <div className="glass-card section-card">
           <div className="section-header">
             <h3>Planejamento</h3>
@@ -293,7 +252,8 @@ const Dashboard = ({ onStartPomodoro }) => {
           </div>
         </div>
 
-        <div className="glass-card section-card">
+        {/* Evolution (Heatmap) Section */}
+        <div className="glass-card section-card heatmap-overview-card">
           <div className="section-header"><h3>Evolução</h3><span className="subtitle">Últimos 90 dias</span></div>
           <div className="heatmap-wrapper">
             <div className="heatmap">
@@ -304,33 +264,16 @@ const Dashboard = ({ onStartPomodoro }) => {
           </div>
           <div className="heatmap-legend">
             <span>Pouco</span>
-            <div className="legend-cells"><div className="heatmap-cell" style={{ backgroundColor: 'rgba(255, 71, 87, 0.2)' }} /><div className="heatmap-cell" style={{ backgroundColor: 'rgba(255, 71, 87, 0.5)' }} /><div className="heatmap-cell" style={{ backgroundColor: 'rgba(255, 71, 87, 0.8)' }} /></div>
+            <div className="legend-cells">
+              <div className="heatmap-cell" style={{ backgroundColor: 'rgba(255, 71, 87, 0.2)' }} />
+              <div className="heatmap-cell" style={{ backgroundColor: 'rgba(255, 71, 87, 0.5)' }} />
+              <div className="heatmap-cell" style={{ backgroundColor: 'rgba(255, 71, 87, 0.8)' }} />
+            </div>
             <span>Muito</span>
-          </div>
-
-          <div className="discipline-ranking">
-            <div className="section-header" style={{ marginTop: '32px', paddingTop: '20px', borderTop: '1px solid var(--border-color)' }}>
-              <h3>Distribuição</h3>
-              <span className="subtitle">Ranking de estudos</span>
-            </div>
-            <div className="stats-list">
-              {disciplineStats.length > 0 ? disciplineStats.map((stat, i) => (
-                <div key={i} className="stat-row">
-                  <div className="stat-info-row">
-                    <span className="stat-name">{stat.name}</span>
-                    <span className="stat-percentage">{stat.percentage}%</span>
-                  </div>
-                  <div className="progress-bar-bg">
-                    <div className="progress-bar-fill" style={{ width: `${stat.percentage}%` }}></div>
-                  </div>
-                </div>
-              )) : (
-                <div className="no-data">Inicie um pomodoro para ver as estatísticas.</div>
-              )}
-            </div>
           </div>
         </div>
       </div>
+
        <style jsx>{`
         .dashboard-container { display: flex; flex-direction: column; gap: 24px; padding-bottom: 20px; }
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -348,7 +291,7 @@ const Dashboard = ({ onStartPomodoro }) => {
         .stat-icon.yellow { background: rgba(255, 165, 2, 0.1); color: #ffa502; }
         
         .dashboard-main { display: grid; grid-template-columns: 1fr; gap: 16px; }
-        @media (min-width: 1100px) { .dashboard-main { grid-template-columns: 1.5fr 1fr; gap: 24px; } }
+        @media (min-width: 1100px) { .dashboard-main { grid-template-columns: 1fr 1fr; gap: 24px; } }
         
         .section-card { padding: 20px; border-radius: 24px; }
         .section-header h3 { color: var(--text-primary); }
@@ -359,6 +302,9 @@ const Dashboard = ({ onStartPomodoro }) => {
         .heatmap-wrapper::-webkit-scrollbar { display: none; }
         .heatmap { display: grid; grid-template-columns: repeat(13, 14px); grid-template-rows: repeat(7, 14px); grid-auto-flow: column; gap: 4px; }
         .heatmap-cell { width: 14px; height: 14px; border-radius: 3px; }
+        .heatmap-legend { display: flex; align-items: center; gap: 12px; font-size: 0.75rem; color: var(--text-muted); margin-top: 12px; }
+        .legend-cells { display: flex; gap: 4px; }
+        .heatmap-overview-card { margin-bottom: 0; }
         
         .plans-list { display: flex; flex-direction: column; gap: 10px; }
         .plan-item { 
@@ -400,7 +346,12 @@ const Dashboard = ({ onStartPomodoro }) => {
         .stat-percentage { font-size: 0.9rem; color: #ff4757; font-weight: 700; }
         .progress-bar-bg { height: 8px; background: var(--accent-secondary); border-radius: 4px; overflow: hidden; }
         .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #ff4757, #ff6b81); border-radius: 4px; }
-        .no-data { text-align: center; color: var(--text-muted); padding: 10px; font-size: 0.85rem; }
+        .no-data-chart {
+          height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+          gap: 12px; color: var(--text-muted); padding: 40px; text-align: center;
+        }
+        .no-data-icon { opacity: 0.2; }
+        .stat-dot { flex-shrink: 0; }
 
         @media (max-width: 600px) {
           .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
