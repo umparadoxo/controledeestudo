@@ -1,5 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { supabase } from './lib/supabase';
+import { Sun, Moon } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import PomodoroTimer from './components/PomodoroTimer';
 import Planning from './components/Planning';
@@ -62,7 +63,7 @@ export const useAuth = () => useContext(AuthContext);
 
 function App() {
   const { user, loading } = useAuth();
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [initialTask, setInitialTask] = useState(null);
@@ -98,6 +99,20 @@ function App() {
       )}
       
       <main className="content">
+        {!isFocusMode && (
+          <div className="mobile-top-header desktop-hide">
+            <h1>{
+              activeTab === 'dashboard' ? 'Painel' : 
+              activeTab === 'timer' ? 'Pomodoro' : 
+              activeTab === 'planning' ? 'Cronograma' : 
+              activeTab === 'stats' ? 'Estatísticas' : 
+              activeTab === 'history' ? 'Histórico' : 'Estudo'
+            }</h1>
+            <button onClick={toggleTheme} className="theme-btn">
+              {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
+            </button>
+          </div>
+        )}
         <div key={activeTab}>
           {activeTab === 'dashboard' && <Dashboard onStartPomodoro={startTask} />}
           {activeTab === 'timer' && (
@@ -120,6 +135,37 @@ function App() {
 export default function AppWrapper() {
   return (
     <ThemeProvider>
+      <style jsx global>{`
+        .mobile-top-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px 4px 20px 4px;
+          background: transparent;
+        }
+        .mobile-top-header h1 {
+          font-size: 1.8rem;
+          font-weight: 800;
+          margin: 0;
+          color: var(--text-primary);
+          letter-spacing: -0.04em;
+        }
+        .theme-btn {
+          background: var(--accent-secondary);
+          border: none;
+          color: var(--text-primary);
+          width: 40px;
+          height: 40px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+        }
+        @media (min-width: 768px) {
+          .mobile-top-header { display: none; }
+        }
+      `}</style>
       <AuthProvider>
         <App />
       </AuthProvider>

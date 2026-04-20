@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { supabase } from '../lib/supabase';
 import conteudo from '../../conteudo.json';
-import { Play, Pause, RotateCcw, Settings, Maximize2, Minimize2, CheckCircle, BookOpen, List, ChevronDown } from 'lucide-react';
+import { Play, Pause, RotateCcw, Settings, Maximize2, Minimize2, CheckCircle, BookOpen, List, ChevronDown, Search, X } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const PomodoroTimer = ({ isFocusMode, setIsFocusMode, initialTask, onClearTask }) => {
   const [minutes, setMinutes] = useState(25);
   const [seconds, setSeconds] = useState(0);
   const [isActive, setIsActive] = useState(false);
-  const [mode, setMode] = useState('study'); // study, shortBreak, longBreak
-  const [settings, setSettings] = useState({ study: 25, short: 5, long: 15 });
+  const [mode, setMode] = useState('study'); // study, shortBreak
+  const [settings, setSettings] = useState({ study: 25, short: 5 });
   const [showSettings, setShowSettings] = useState(false);
   const [sessionsCompleted, setSessionsCompleted] = useState(0);
   
@@ -18,6 +19,9 @@ const PomodoroTimer = ({ isFocusMode, setIsFocusMode, initialTask, onClearTask }
     discipline: initialTask?.discipline || '',
     topic: initialTask?.topic || ''
   });
+  const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
+  const [isDisciplineModalOpen, setIsDisciplineModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const timerRef = useRef(null);
 
@@ -27,6 +31,31 @@ const PomodoroTimer = ({ isFocusMode, setIsFocusMode, initialTask, onClearTask }
     const discipline = conteudo.cronograma.find(d => d.disciplina === currentTask.discipline);
     return discipline ? discipline.assuntos.flatMap(a => a.topicos) : [];
   }, [currentTask.discipline]);
+
+  const filteredTopics = availableTopics.filter(t => 
+    t.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleTopicSelect = (topic) => {
+    setCurrentTask({ ...currentTask, topic });
+    setIsTopicModalOpen(false);
+    setSearchTerm('');
+  };
+
+  const handleDisciplineSelect = (discipline) => {
+    setCurrentTask({ discipline, topic: '' });
+    setIsDisciplineModalOpen(false);
+    setSearchTerm('');
+  };
+
+  useEffect(() => {
+    if (isTopicModalOpen || isDisciplineModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [isTopicModalOpen, isDisciplineModalOpen]);
 
   // Audio generation
   const playSound = (type) => {
@@ -69,14 +98,13 @@ const PomodoroTimer = ({ isFocusMode, setIsFocusMode, initialTask, onClearTask }
         });
       }
       setSessionsCompleted(prev => prev + 1);
-      if ((sessionsCompleted + 1) % 4 === 0) switchMode('longBreak');
-      else switchMode('shortBreak');
+      switchMode('shortBreak');
     } else switchMode('study');
   };
 
   const switchMode = (newMode) => {
     setMode(newMode); setIsActive(false);
-    const time = newMode === 'study' ? settings.study : (newMode === 'shortBreak' ? settings.short : settings.long);
+    const time = newMode === 'study' ? settings.study : settings.short;
     setMinutes(time); setSeconds(0);
   };
 
@@ -87,7 +115,7 @@ const PomodoroTimer = ({ isFocusMode, setIsFocusMode, initialTask, onClearTask }
     const { name, value } = e.target;
     const val = parseInt(value) || 1;
     setSettings(prev => ({ ...prev, [name]: val }));
-    if (!isActive && mode === name || (name === 'short' && mode === 'shortBreak') || (name === 'long' && mode === 'longBreak')) {
+    if (!isActive && mode === name || (name === 'short' && mode === 'shortBreak')) {
       setMinutes(val); setSeconds(0);
     }
   };
@@ -99,31 +127,27 @@ const PomodoroTimer = ({ isFocusMode, setIsFocusMode, initialTask, onClearTask }
           <div className="task-header-row">
              <div className="task-field">
                <span className="task-label"><BookOpen size={14} /> Disciplina</span>
-               <select 
-                className="task-select discipline-select"
-                value={currentTask.discipline}
-                onChange={(e) => setCurrentTask({ discipline: e.target.value, topic: '' })}
+               <div 
+                className="task-select-trigger"
+                onClick={() => setIsDisciplineModalOpen(true)}
                >
-                 <option value="">Selecione...</option>
-                 {conteudo.cronograma.map((bg, i) => (
-                   <option key={i} value={bg.disciplina} className="dark-option">{bg.disciplina}</option>
-                 ))}
-               </select>
+                 <span className="selected-value">
+                   {currentTask.discipline || 'Selecionar disciplina...'}
+                 </span>
+                 <ChevronDown size={16} />
+               </div>
              </div>
              <div className="task-field">
                <span className="task-label"><List size={14} /> Tópico</span>
-               <select 
-                className="task-select topic-select"
-                value={currentTask.topic}
-                disabled={!currentTask.discipline}
-                onChange={(e) => setCurrentTask({ ...currentTask, topic: e.target.value })}
+               <div 
+                className={`task-select-trigger ${!currentTask.discipline ? 'disabled' : ''}`}
+                onClick={() => currentTask.discipline && setIsTopicModalOpen(true)}
                >
-                 <option value="">Selecione...</option>
-                 {availableTopics.map((t, i) => (
-                   <option key={i} value={t} className="dark-option">{t}</option>
-                 ))}
-                 {currentTask.discipline && <option value="Outro (Manual)" className="dark-option">Outro... (Digite abaixo)</option>}
-               </select>
+                 <span className="selected-value">
+                   {currentTask.topic || (currentTask.discipline ? 'Selecionar tópico...' : 'Escolha a disciplina primeiro')}
+                 </span>
+                 <ChevronDown size={16} />
+               </div>
              </div>
           </div>
           {currentTask.topic === 'Outro (Manual)' && (
@@ -139,13 +163,115 @@ const PomodoroTimer = ({ isFocusMode, setIsFocusMode, initialTask, onClearTask }
         </div>
       </div>
 
+      {/* Topic Selection Modal */}
+      {isTopicModalOpen && createPortal(
+        <div className="modal-overlay animate-fade-in" onClick={() => setIsTopicModalOpen(false)}>
+          <div className="modal-content glass-card animate-scale-up" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-title-group">
+                <h3>Selecionar Tópico</h3>
+                <p>{currentTask.discipline}</p>
+              </div>
+              <button className="close-modal-btn" onClick={() => setIsTopicModalOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="modal-search">
+              <Search size={18} />
+              <input 
+                type="text" 
+                placeholder="Pesquisar tópico..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                autoFocus
+              />
+            </div>
+
+            <div className="topics-list-container">
+              <button 
+                className={`topic-option-btn ${currentTask.topic === 'Outro (Manual)' ? 'selected' : ''}`}
+                onClick={() => handleTopicSelect('Outro (Manual)')}
+              >
+                <span className="topic-text">Outro... (Digitar manualmente)</span>
+              </button>
+              
+              {filteredTopics.map((topic, i) => (
+                <button 
+                  key={i} 
+                  className={`topic-option-btn ${currentTask.topic === topic ? 'selected' : ''}`}
+                  onClick={() => handleTopicSelect(topic)}
+                >
+                  <span className="topic-text">{topic}</span>
+                </button>
+              ))}
+
+              {filteredTopics.length === 0 && searchTerm && (
+                <div className="no-topics-found">
+                  Nenhum tópico encontrado para "{searchTerm}"
+                </div>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Discipline Selection Modal */}
+      {isDisciplineModalOpen && createPortal(
+        <div className="modal-overlay animate-fade-in" onClick={() => setIsDisciplineModalOpen(false)}>
+          <div className="modal-content glass-card animate-scale-up" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-title-group">
+                <h3>Selecionar Disciplina</h3>
+                <p>Escolha o que vai estudar agora</p>
+              </div>
+              <button className="close-modal-btn" onClick={() => setIsDisciplineModalOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="modal-search">
+              <Search size={18} />
+              <input 
+                type="text" 
+                placeholder="Pesquisar disciplina..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                autoFocus
+              />
+            </div>
+
+            <div className="topics-list-container">
+              {conteudo.cronograma
+                .filter(d => d.disciplina.toLowerCase().includes(searchTerm.toLowerCase()))
+                .map((bg, i) => (
+                <button 
+                  key={i} 
+                  className={`topic-option-btn ${currentTask.discipline === bg.disciplina ? 'selected' : ''}`}
+                  onClick={() => handleDisciplineSelect(bg.disciplina)}
+                >
+                  <span className="topic-text">{bg.disciplina}</span>
+                </button>
+              ))}
+
+              {conteudo.cronograma.filter(d => d.disciplina.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 && (
+                <div className="no-topics-found">
+                  Nenhuma disciplina encontrada para "{searchTerm}"
+                </div>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
       <div className="glass-card timer-card">
         <div className="timer-header">
           <div className="header-spacer" />
           <div className="mode-selector">
             <button className={`mode-btn ${mode === 'study' ? 'active study' : ''}`} onClick={() => switchMode('study')}>Foco</button>
-            <button className={`mode-btn ${mode === 'shortBreak' ? 'active break' : ''}`} onClick={() => switchMode('shortBreak')}>Pausa Curta</button>
-            <button className={`mode-btn ${mode === 'longBreak' ? 'active break' : ''}`} onClick={() => switchMode('longBreak')}>Pausa Longa</button>
+            <button className={`mode-btn ${mode === 'shortBreak' ? 'active break' : ''}`} onClick={() => switchMode('shortBreak')}>Pausa</button>
           </div>
           <div className="timer-actions-top">
             <button className="icon-btn" onClick={() => setShowSettings(!showSettings)} title="Configurações">
@@ -165,10 +291,9 @@ const PomodoroTimer = ({ isFocusMode, setIsFocusMode, initialTask, onClearTask }
         </div>
 
         {showSettings && (
-          <div className="settings-panel animate-fade-in">
+          <div className="settings-panel animate-fade-in two-cols">
             <div className="setting-group"><label>Estudo</label><input type="number" name="study" value={settings.study} onChange={handleSettingChange} /></div>
-            <div className="setting-group"><label>Curta</label><input type="number" name="short" value={settings.short} onChange={handleSettingChange} /></div>
-            <div className="setting-group"><label>Longa</label><input type="number" name="long" value={settings.long} onChange={handleSettingChange} /></div>
+            <div className="setting-group"><label>Pausa</label><input type="number" name="short" value={settings.short} onChange={handleSettingChange} /></div>
           </div>
         )}
 
@@ -188,7 +313,7 @@ const PomodoroTimer = ({ isFocusMode, setIsFocusMode, initialTask, onClearTask }
         .task-header-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .task-field { display: flex; flex-direction: column; gap: 8px; }
         .task-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); display: flex; align-items: center; gap: 4px; font-weight: 700; }
-        .task-select { 
+        .task-select, .task-select-trigger { 
           background: var(--input-bg); 
           border: 1px solid var(--border-color); 
           color: var(--text-primary); 
@@ -199,10 +324,93 @@ const PomodoroTimer = ({ isFocusMode, setIsFocusMode, initialTask, onClearTask }
           color-scheme: var(--color-scheme);
           outline: none;
           transition: var(--transition);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          min-height: 42px;
         }
-        .task-select:focus { border-color: var(--accent-primary); background: var(--input-bg); }
+        .task-select-trigger.disabled { opacity: 0.5; cursor: not-allowed; background: rgba(0,0,0,0.05); }
+        .task-select:focus, .task-select-trigger:not(.disabled):hover { border-color: var(--accent-primary); background: var(--input-bg); }
+        .selected-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; }
         .dark-option { background-color: var(--bg-color); color: var(--text-primary); }
-        .task-input-inline { background: var(--input-bg); border: 1px solid var(--accent-primary); color: var(--text-primary); border-radius: 8px; padding: 10px; width: 100%; outline: none; }
+        .task-input-inline { background: var(--input-bg); border: 1px solid var(--accent-primary); color: var(--text-primary); border-radius: 8px; padding: 10px; width: 100%; outline: none; margin-top: 8px; }
+
+        .modal-overlay {
+          position: fixed; inset: 0;
+          background: rgba(0, 0, 0, 0.5);
+          backdrop-filter: blur(8px);
+          display: flex; align-items: center; justify-content: center;
+          z-index: 5000; padding: 20px;
+        }
+        .modal-content {
+          width: 100%; max-width: 600px; max-height: 80vh;
+          display: flex; flex-direction: column; overflow: hidden;
+          padding: 0; border: 1px solid var(--border-color);
+          background: var(--bg-color);
+        }
+        .modal-header {
+          padding: 24px; border-bottom: 1px solid var(--border-color);
+          display: flex; justify-content: space-between; align-items: flex-start;
+        }
+        .modal-title-group h3 { margin: 0; font-size: 1.25rem; color: var(--text-primary); }
+        .modal-title-group p { margin: 4px 0 0; font-size: 0.85rem; color: var(--text-muted); }
+        .close-modal-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; transition: var(--transition); }
+        .close-modal-btn:hover { color: var(--accent-primary); transform: rotate(90deg); }
+
+        .modal-search {
+          padding: 16px 24px; display: flex; align-items: center; gap: 12px;
+          background: rgba(255, 255, 255, 0.02); border-bottom: 1px solid var(--border-color);
+        }
+        .modal-search input {
+          flex: 1; background: transparent; border: none; color: var(--text-primary);
+          font-size: 1rem; outline: none;
+        }
+        .modal-search svg { color: var(--text-muted); }
+
+        .topics-list-container {
+          flex: 1; overflow-y: auto; padding: 12px;
+          display: flex; flex-direction: column; gap: 8px;
+        }
+        .topic-option-btn {
+          padding: 14px 20px; text-align: left; background: transparent;
+          border: 1px solid transparent; border-radius: 12px;
+          color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
+          display: flex; align-items: center;
+        }
+        .topic-option-btn:hover { background: rgba(255, 71, 87, 0.05); color: var(--accent-primary); border-color: rgba(255, 71, 87, 0.1); }
+        .topic-option-btn.selected { background: var(--accent-primary); color: white; }
+        .topic-text { font-size: 0.95rem; line-height: 1.4; }
+        .no-topics-found { padding: 40px; text-align: center; color: var(--text-muted); font-style: italic; }
+
+        @media (max-width: 600px) {
+          .modal-overlay {
+            align-items: stretch;
+            padding: 0;
+            background: var(--bg-color);
+            z-index: 99999;
+          }
+          .modal-content {
+            height: 100% !important;
+            max-height: 100% !important;
+            width: 100%;
+            border-radius: 0;
+            border: none;
+            background: var(--bg-color);
+          }
+          .modal-header {
+            padding: 24px 20px;
+          }
+          .modal-title-group h3 {
+            font-size: 1.3rem;
+          }
+          .modal-title-group p {
+            display: block; /* Volta a mostrar o subtítulo já que temos espaço agora */
+            font-size: 0.9rem;
+          }
+          .modal-search {
+            padding: 16px 20px;
+          }
+        }
         
         .timer-card { width: 100%; max-width: 500px; padding: 32px; display: flex; flex-direction: column; align-items: center; gap: 40px; }
         .fullscreen .timer-card { max-width: 800px; background: transparent; border: none; box-shadow: none; }
@@ -246,7 +454,8 @@ const PomodoroTimer = ({ isFocusMode, setIsFocusMode, initialTask, onClearTask }
         .reset-btn, .next-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 12px; }
         .reset-btn:hover, .next-btn:hover { color: var(--text-primary); }
 
-        .settings-panel { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; background: rgba(255, 255, 255, 0.03); padding: 16px; border-radius: 16px; }
+        .settings-panel { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; background: rgba(255, 255, 255, 0.03); padding: 16px; border-radius: 16px; }
+        .settings-panel.two-cols { grid-template-columns: 1fr 1fr; }
         .setting-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; text-align: center; }
         .setting-group input { text-align: center; padding: 8px; font-size: 1rem; }
 

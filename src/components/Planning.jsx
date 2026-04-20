@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { supabase } from '../lib/supabase';
 import conteudo from '../../conteudo.json';
-import { Save, Calendar, BookOpen, Plus, X } from 'lucide-react';
+import { Save, Calendar, BookOpen, Plus, X, Search, ChevronDown } from 'lucide-react';
 
 const Planning = () => {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeSelection, setActiveSelection] = useState(null); // { dayId, taskIndex }
 
   const daysOfWeek = [
     { id: 0, name: 'Domingo' },
@@ -85,6 +89,28 @@ const Planning = () => {
     }));
   };
 
+  const handleDisciplineSelect = (discipline) => {
+    if (activeSelection) {
+      handleTaskChange(activeSelection.dayId, activeSelection.taskIndex, discipline);
+    }
+    setIsModalOpen(false);
+    setSearchTerm('');
+    setActiveSelection(null);
+  };
+
+  const filteredDisciplines = conteudo.cronograma.filter(d => 
+    d.disciplina.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [isModalOpen]);
+
   const savePlans = async () => {
     setSaving(true);
     const { data: { user } } = await supabase.auth.getUser();
@@ -142,16 +168,16 @@ const Planning = () => {
                 <div key={idx} className="task-row">
                   <div className="select-group">
                     <label><BookOpen size={12} /> Disciplina</label>
-                    <select 
-                      className="discipline-select-card"
-                      value={task.discipline} 
-                      onChange={(e) => handleTaskChange(day.day_of_week, idx, e.target.value)}
+                    <div 
+                      className="discipline-select-trigger"
+                      onClick={() => {
+                        setActiveSelection({ dayId: day.day_of_week, taskIndex: idx });
+                        setIsModalOpen(true);
+                      }}
                     >
-                      <option value="">Selecione...</option>
-                      {conteudo.cronograma.map((bg, i) => (
-                        <option key={i} value={bg.disciplina}>{bg.disciplina}</option>
-                      ))}
-                    </select>
+                      <span>{task.discipline || 'Selecionar...'}</span>
+                      <ChevronDown size={14} />
+                    </div>
                   </div>
                   {day.tasks.length > 1 && (
                     <button className="remove-task-btn" onClick={() => removeTask(day.day_of_week, idx)}>
@@ -168,6 +194,50 @@ const Planning = () => {
           </div>
         ))}
       </div>
+
+      {/* Discipline Selection Modal */}
+      {isModalOpen && createPortal(
+        <div className="modal-overlay animate-fade-in" onClick={() => setIsModalOpen(false)}>
+          <div className="modal-content glass-card animate-scale-up" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-title-group">
+                <h3>Selecionar Disciplina</h3>
+                <p>Escolha a disciplina para o seu cronograma</p>
+              </div>
+              <button className="close-modal-btn" onClick={() => setIsModalOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="modal-search">
+              <Search size={18} />
+              <input 
+                type="text" 
+                placeholder="Pesquisar disciplina..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                autoFocus
+              />
+            </div>
+
+            <div className="disciplines-list">
+              {filteredDisciplines.map((d, i) => (
+                <button 
+                  key={i} 
+                  className={`discipline-option ${activeSelection && plans.find(p => p.day_of_week === activeSelection.dayId).tasks[activeSelection.taskIndex].discipline === d.disciplina ? 'selected' : ''}`}
+                  onClick={() => handleDisciplineSelect(d.disciplina)}
+                >
+                  <span className="discipline-text">{d.disciplina}</span>
+                </button>
+              ))}
+              {filteredDisciplines.length === 0 && (
+                <div className="no-results">Nenhuma disciplina encontrada.</div>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       <style jsx>{`
         .planning-container { display: flex; flex-direction: column; gap: 32px; }
@@ -195,6 +265,55 @@ const Planning = () => {
         }
         .add-task-btn:hover { background: var(--accent-secondary); color: var(--text-primary); }
         .loading { display: flex; justify-content: center; align-items: center; height: 300px; color: var(--text-primary); }
+
+        .discipline-select-trigger {
+          background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 10px;
+          padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;
+          color: var(--text-primary); cursor: pointer; transition: all 0.2s; font-size: 0.85rem;
+          min-height: 40px;
+        }
+        .discipline-select-trigger:hover { border-color: var(--accent-primary); background: rgba(255, 71, 87, 0.03); }
+
+        .modal-overlay {
+          position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px);
+          display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px;
+        }
+        .modal-content {
+          width: 100%; max-width: 500px; max-height: 80vh;
+          display: flex; flex-direction: column; overflow: hidden;
+          padding: 0; border: 1px solid var(--border-color);
+          background: var(--bg-color);
+        }
+        .modal-header { padding: 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: flex-start; }
+        .modal-title-group h3 { margin: 0; font-size: 1.2rem; color: var(--text-primary); }
+        .modal-title-group p { margin: 4px 0 0; font-size: 0.8rem; color: var(--text-muted); }
+        .close-modal-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+        .close-modal-btn:hover { color: var(--accent-primary); transform: rotate(90deg); }
+
+        .modal-search { padding: 16px 24px; display: flex; align-items: center; gap: 12px; background: rgba(255, 255, 255, 0.02); border-bottom: 1px solid var(--border-color); }
+        .modal-search input { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 0.95rem; outline: none; }
+        .modal-search svg { color: var(--text-muted); }
+
+        .disciplines-list { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+        .discipline-option {
+          padding: 12px 16px; text-align: left; background: transparent; border: 1px solid transparent;
+          border-radius: 10px; color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
+        }
+        .discipline-option:hover { background: rgba(255, 71, 87, 0.05); color: var(--accent-primary); }
+        .discipline-option.selected { background: var(--accent-primary); color: white; }
+        .discipline-text { font-size: 0.9rem; }
+        .no-results { padding: 40px; text-align: center; color: var(--text-muted); font-style: italic; }
+
+        @media (max-width: 600px) {
+          .modal-overlay { align-items: stretch; padding: 0; background: var(--bg-color); z-index: 99999; }
+          .modal-content { height: 100% !important; max-height: 100% !important; width: 100%; border-radius: 0; border: none; background: var(--bg-color); }
+          .modal-header { padding: 24px 20px; }
+          .modal-title-group h3 { font-size: 1.3rem; }
+          .modal-title-group p { display: block; font-size: 0.9rem; }
+          .modal-search { padding: 16px 20px; }
+          .planning-header { display: none; }
+        }
 
       `}</style>
     </div>

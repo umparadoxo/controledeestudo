@@ -74,9 +74,6 @@ const Navbar = ({ activeTab, setActiveTab, userEmail }) => {
             <item.icon size={26} color={activeTab === item.id ? '#ff4757' : (theme === 'light' ? '#94a3b8' : '#747d8c')} strokeWidth={activeTab === item.id ? 2.5 : 2} />
           </button>
         ))}
-        <button onClick={toggleTheme} className="mobile-nav-btn">
-          {theme === 'dark' ? <Sun size={26} color="#747d8c" /> : <Moon size={26} color="#94a3b8" />}
-        </button>
       </nav>
 
       <style jsx>{`
@@ -117,11 +114,11 @@ const Navbar = ({ activeTab, setActiveTab, userEmail }) => {
         .nav-logout-btn:hover { background: rgba(255, 71, 87, 0.2); transform: scale(1.05); }
         
         .mobile-bottom-nav {
-          position: fixed; bottom: 16px; left: 16px; right: 16px;
+          position: fixed; bottom: 0; left: 0; right: 0;
           height: 64px; background: var(--surface-color);
-          border: 1px solid var(--border-color); border-radius: 20px;
+          border-top: 1px solid var(--border-color); border-radius: 0;
           display: flex; justify-content: space-around; align-items: center;
-          z-index: 1000; box-shadow: var(--card-shadow);
+          z-index: 1000; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
           backdrop-filter: var(--glass-blur);
         }
 

@@ -360,6 +360,7 @@ const Dashboard = ({ onStartPomodoro }) => {
           .section-card { padding: 16px; }
           .plan-item { gap: 8px; }
           .discipline-full-name { font-size: 0.95rem; }
+          .stats-overview-card .section-header { display: none; }
         }
       `}</style>
 
